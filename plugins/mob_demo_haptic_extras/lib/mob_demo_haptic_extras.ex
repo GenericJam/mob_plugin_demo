@@ -1,20 +1,13 @@
 defmodule MobDemoHapticExtras do
   @moduledoc """
-  Tier-1 demo plugin: the smallest plugin that ships native code.
+  Tier-1 demo plugin: the smallest plugin that ships a real static NIF.
 
-  Exercises the manifest's `:nifs` / `:android` / `:ios` sections. The native
-  side is a stub (one function returning `:ok`); the focus is the build
-  pipeline, not the haptics. Real static-NIF loading wires up when the
-  compile-time merge engine lands.
+  `buzz/0` calls into the `haptic_extras_nif` Erlang NIF module
+  (priv/native/jni/haptic_extras.c), statically linked into the host binary
+  on device. On a host dev build the NIF isn't linked, so calling `buzz/0`
+  there raises `nif_not_loaded` — it only runs once the native merge (part 2)
+  compiles + links the source into the binary.
   """
 
-  defdelegate buzz, to: MobDemoHapticExtras.Nif
-end
-
-defmodule MobDemoHapticExtras.Nif do
-  @moduledoc false
-
-  # Placeholder until the merge engine statically links the NIF into the host's
-  # libpigeon.so. Until then this is a plain Elixir stub so the wrapper loads.
-  def buzz, do: :ok
+  defdelegate buzz, to: :haptic_extras_nif
 end
