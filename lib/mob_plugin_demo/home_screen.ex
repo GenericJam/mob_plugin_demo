@@ -30,6 +30,10 @@ defmodule MobPluginDemo.HomeScreen do
         {nav_button("Camera",              :open_camera)}
         <Spacer size={12} />
         {nav_button("Storage",             :open_storage)}
+        <Spacer size={24} />
+        <Text text="Plugin demo — SignaturePad" text_size={:sm} text_color={:muted} padding={4} />
+        <Spacer size={8} />
+        {MobDemoSignaturePad.signature_pad(id: :sig_pad, bg_color: "#3366cc", corner_radius: 12)}
         <Spacer size={32} />
         <Text text="Theme" text_size={:sm} text_color={:muted} padding={4} />
         <Spacer size={8} />

@@ -2609,6 +2609,12 @@ typealias MobNativeViewFactory = @Composable (props: Map<String, Any?>, send: Mo
 object MobNativeViewRegistry {
     private val factories = mutableMapOf<String, MobNativeViewFactory>()
 
+    // Plugin registrations. Until the plugin merge engine wires plugin Kotlin
+    // into the build automatically, plugins register here at app startup.
+    init {
+        MobSignaturePadPlugin.register()
+    }
+
     fun register(name: String, factory: MobNativeViewFactory) {
         factories[name] = factory
     }
@@ -4031,4 +4037,43 @@ class NotificationReceiver : BroadcastReceiver() {
         // For foreground delivery, the screen registers via Mob.Permissions before scheduling.
     }
 
+}
+
+// ── mob_demo_signature_pad (tier-2 plugin component) ─────────────────────────
+// Pasted from plugins/mob_demo_signature_pad/priv/native/android/MobSignaturePad.kt.
+// The plugin merge engine will replace this manual paste with automated source
+// inclusion + registration in a follow-up slice. The MobNativeViewRegistry init
+// block above wires the registration to fire at startup.
+
+object MobSignaturePadPlugin {
+    fun register() {
+        MobNativeViewRegistry.register("MobDemoSignaturePad_View") { props, _send ->
+            MobSignaturePadComposable(props)
+        }
+    }
+}
+
+@Composable
+private fun MobSignaturePadComposable(props: Map<String, Any?>) {
+    val bg = (props["bg_color"] as? String) ?: "#3366cc"
+    val radius = (props["corner_radius"] as? Number)?.toFloat() ?: 12f
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(160.dp)
+            .clip(RoundedCornerShape(radius.dp))
+            .background(parseHexColorForSignaturePad(bg))
+    )
+}
+
+private fun parseHexColorForSignaturePad(s: String): Color {
+    val h = if (s.startsWith("#")) s.drop(1) else s
+    return if (h.length == 6) {
+        Color(
+            h.substring(0, 2).toInt(16),
+            h.substring(2, 4).toInt(16),
+            h.substring(4, 6).toInt(16)
+        )
+    } else Color.Gray
 }

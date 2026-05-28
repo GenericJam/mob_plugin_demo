@@ -24,6 +24,7 @@ defmodule MobPluginDemo.MixProject do
       # Phase 1 prototype plugins (local path deps).
       {:mob_palette_demo, path: "plugins/mob_palette_demo"},
       {:mob_demo_haptic_extras, path: "plugins/mob_demo_haptic_extras"},
+      {:mob_demo_signature_pad, path: "plugins/mob_demo_signature_pad"},
       {:ecto_sqlite3, "~> 0.18"},
       # Code quality — Credo + ex_slop (catches AI-generated patterns
       # like blanket rescue, narrator docs, redundant Enum chains, etc).
