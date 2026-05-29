@@ -20,7 +20,16 @@
       # with dots replaced by `_`. This is what Mob.Component.module_name/1
       # emits at render time as the `:module` prop, and what the iOS / Android
       # MobNativeViewRegistry looks up.
-      ios: %{view_module: "MobDemoSignaturePad_View"},
+      #
+      # `swift_struct` is the SwiftUI struct the iOS bootstrap codegen
+      # instantiates: `<swift_struct>(props: props)`. The struct name is not
+      # derivable from `view_module` (the view_module is the Elixir-module
+      # convention; the struct is whatever the plugin author named the
+      # SwiftUI type), so the manifest declares it explicitly.
+      ios: %{
+        view_module: "MobDemoSignaturePad_View",
+        swift_struct: "MobSignaturePadView"
+      },
       android: %{composable: "MobDemoSignaturePad_View"}
     }
   ]

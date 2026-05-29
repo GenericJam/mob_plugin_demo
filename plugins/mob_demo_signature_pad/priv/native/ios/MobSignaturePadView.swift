@@ -1,15 +1,19 @@
 // MobSignaturePadView — tier-2 demo plugin's SwiftUI view.
 //
-// Two pieces:
-//   1. MobSignaturePadView — the SwiftUI view body.
-//   2. MobDemoSignaturePadPlugin — an Objective-C-visible class with a
-//      class method the host (or a future mob_dev codegen step) can call
-//      from AppDelegate.didFinishLaunchingWithOptions, before mob_init_ui,
-//      to register the view factory with MobNativeViewRegistry.shared.
+// Ships only the SwiftUI struct. Registration with
+// MobNativeViewRegistry.shared is handled by the build-time-generated
+// `mob_register_plugins()` function (see MobDev.Plugin.IOSBootstrap),
+// which AppDelegate.m calls before mob_init_ui(). The codegen reads the
+// plugin's manifest to know:
 //
-// The registry key matches the manifest's ui_components.ios.view_module
-// (`"MobDemoSignaturePad_View"`) and what Mob.Component.module_name/1
-// emits at render time as the node's `:module` prop.
+//   * which registry key to register under
+//     (`ui_components.ios.view_module` — must match what
+//     Mob.Component.module_name/1 emits as the node's `:module` prop)
+//   * which Swift struct to instantiate
+//     (`ui_components.ios.swift_struct` — this file's `MobSignaturePadView`)
+//
+// Pre-codegen this file also exported an @objc class with a `mob_register`
+// classmethod the host called by hand; that's gone now.
 import SwiftUI
 import Foundation
 
@@ -32,13 +36,5 @@ struct MobSignaturePadView: View {
         let g = Double((v >> 8) & 0xff) / 255.0
         let b = Double(v & 0xff) / 255.0
         return Color(red: r, green: g, blue: b)
-    }
-}
-
-@objc public class MobDemoSignaturePadPlugin: NSObject {
-    @objc public class func mob_register() {
-        MobNativeViewRegistry.shared.register("MobDemoSignaturePad_View") { props, _send in
-            AnyView(MobSignaturePadView(props: props))
-        }
     }
 }
