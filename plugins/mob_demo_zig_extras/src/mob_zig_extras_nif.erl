@@ -6,7 +6,7 @@
 %% build it isn't linked, so on_load tolerates the load failure and the stubs
 %% fall back to nif_error until the native merge links the .zig in.
 -module(mob_zig_extras_nif).
--export([answer/0, ping/0]).
+-export([answer/0, ping/0, kotlin_greet/0]).
 -on_load(init/0).
 
 init() ->
@@ -19,4 +19,7 @@ answer() ->
     erlang:nif_error(nif_not_loaded).
 
 ping() ->
+    erlang:nif_error(nif_not_loaded).
+
+kotlin_greet() ->
     erlang:nif_error(nif_not_loaded).
