@@ -1,11 +1,17 @@
 // MobSignaturePadView — tier-2 demo plugin's SwiftUI view.
 //
-// iOS-side placeholder. Tier-2 iOS integration follows the same pattern as
-// Android — host wires this into the project's existing native_view dispatch
-// (or a future merge-engine slice automates it). Mob's iOS render pipeline
-// already routes native_view nodes via the `module` prop (see ios/mob_nif.m
-// `MobNodeTypeNativeView`).
+// Two pieces:
+//   1. MobSignaturePadView — the SwiftUI view body.
+//   2. MobDemoSignaturePadPlugin — an Objective-C-visible class with a
+//      class method the host (or a future mob_dev codegen step) can call
+//      from AppDelegate.didFinishLaunchingWithOptions, before mob_init_ui,
+//      to register the view factory with MobNativeViewRegistry.shared.
+//
+// The registry key matches the manifest's ui_components.ios.view_module
+// (`"MobDemoSignaturePad_View"`) and what Mob.Component.module_name/1
+// emits at render time as the node's `:module` prop.
 import SwiftUI
+import Foundation
 
 struct MobSignaturePadView: View {
     let props: [String: Any]
@@ -26,5 +32,13 @@ struct MobSignaturePadView: View {
         let g = Double((v >> 8) & 0xff) / 255.0
         let b = Double(v & 0xff) / 255.0
         return Color(red: r, green: g, blue: b)
+    }
+}
+
+@objc public class MobDemoSignaturePadPlugin: NSObject {
+    @objc public class func mob_register() {
+        MobNativeViewRegistry.shared.register("MobDemoSignaturePad_View") { props, _send in
+            AnyView(MobSignaturePadView(props: props))
+        }
     }
 }

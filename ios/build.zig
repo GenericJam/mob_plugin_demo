@@ -64,6 +64,8 @@ pub fn build(b: *std.Build) void {
     const project_c_nifs = b.option([]const u8, "project_c_nifs", "Comma-separated C NIF names (each at c_src/<name>.c); empty if none") orelse "";
     const project_rust_libs = b.option([]const u8, "project_rust_libs", "Comma-separated absolute paths to Rust NIF .a files (pre-built by mob_dev)") orelse "";
     const project_swift_sources = b.option([]const u8, "project_swift_sources", "Comma-separated absolute paths to extra project Swift sources; empty if none") orelse "";
+    const plugin_swift_files = b.option([]const u8, "plugin_swift_files", "Comma-separated absolute paths to plugin Swift sources; empty if none") orelse "";
+    const plugin_frameworks = b.option([]const u8, "plugin_frameworks", "Comma-separated iOS framework names contributed by plugins; empty if none") orelse "";
     // MLX + EMLX. See build_device.zig.eex for full rationale.
     const mlx_static = b.option(bool, "mlx_static", "EMLX NIF statically linked + libmlx.a included (-DMOB_STATIC_EMLX_NIF on driver_tab)") orelse false;
     const mlx_dir = b.option([]const u8, "mlx_dir", "Absolute path to extracted MLX bundle (libmlx.a + libemlx.a + include/)") orelse "";
@@ -71,6 +73,9 @@ pub fn build(b: *std.Build) void {
     // libnx_eigen.a per arch and threads the output dir through nxeigen_dir.
     const nxeigen_static = b.option(bool, "nxeigen_static", "NxEigen NIF statically linked (-DMOB_STATIC_NX_EIGEN_NIF on driver_tab)") orelse false;
     const nxeigen_dir = b.option([]const u8, "nxeigen_dir", "Absolute path to dir containing libnx_eigen.a") orelse "";
+    // tflite_static declared so driver_tab_ios.o sees a matching build_options
+    // field (the generator references it unconditionally).
+    const tflite_static = b.option(bool, "tflite_static", "TFLite NIF statically linked (-DMOB_STATIC_TFLITE_NIF on driver_tab)") orelse false;
 
     const objects_step = b.step(
         "objects",
@@ -125,6 +130,13 @@ pub fn build(b: *std.Build) void {
             swift_run.addFileArg(.{ .cwd_relative = source });
         }
     }
+    if (plugin_swift_files.len > 0) {
+        var plugin_swift_it = std.mem.splitScalar(u8, plugin_swift_files, ',');
+        while (plugin_swift_it.next()) |source| {
+            if (source.len == 0) continue;
+            swift_run.addFileArg(.{ .cwd_relative = source });
+        }
+    }
     swift_run.addArg("-c");
     swift_run.addArg("-emit-objc-header");
     swift_run.addArg("-emit-objc-header-path");
@@ -170,6 +182,7 @@ pub fn build(b: *std.Build) void {
         opts.addOption(bool, "sqlite_static", false);
         opts.addOption(bool, "emlx_static", mlx_static);
         opts.addOption(bool, "nx_eigen_static", nxeigen_static);
+        opts.addOption(bool, "tflite_static", tflite_static);
         break :blk addZigObject(b, .{
             .name = "driver_tab_ios",
             .source = driver_tab,
@@ -272,6 +285,7 @@ pub fn build(b: *std.Build) void {
         .nxeigen_static = nxeigen_static,
         .nxeigen_dir = nxeigen_dir,
         .project_rust_libs = project_rust_libs,
+        .plugin_frameworks = plugin_frameworks,
         .objects = objs.items,
     });
 }
@@ -434,6 +448,7 @@ const LinkOptions = struct {
     // (pre-built by mob_dev with `cargo rustc --target
     // aarch64-apple-ios-sim --crate-type staticlib`). Empty if none.
     project_rust_libs: []const u8,
+    plugin_frameworks: []const u8 = "",
     objects: []const std.Build.LazyPath,
 };
 
@@ -520,6 +535,13 @@ fn addLink(b: *std.Build, step: *std.Build.Step, opts: LinkOptions) void {
     };
     for (frameworks_base) |fw| {
         run.addArgs(&.{ "-Xlinker", "-framework", "-Xlinker", fw });
+    }
+    if (opts.plugin_frameworks.len > 0) {
+        var fw_it = std.mem.splitScalar(u8, opts.plugin_frameworks, ',');
+        while (fw_it.next()) |fw| {
+            if (fw.len == 0) continue;
+            run.addArgs(&.{ "-Xlinker", "-framework", "-Xlinker", fw });
+        }
     }
 
     // Apple's Accelerate framework provides vectorized BLAS/LAPACK used by

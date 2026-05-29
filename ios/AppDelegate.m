@@ -29,6 +29,13 @@ static void* beam_thread(void* arg) {
     self.window.rootViewController = vc;
     [self.window makeKeyAndVisible];
 
+    // TIER-2 PLUGIN SMOKE 2026-05-28 — hand-wired bootstrap. In production
+    // mob_dev should code-generate a `mob_register_plugins()` function from
+    // the activated-plugin list (mirrors the Android `MobBridge.kt` paste
+    // pattern). Until that lands, each tier-2 plugin's @objc register class
+    // is invoked explicitly here.
+    [MobDemoSignaturePadPlugin mob_register];
+
     mob_init_ui();
 
     extern const char* mob_app_module(void);

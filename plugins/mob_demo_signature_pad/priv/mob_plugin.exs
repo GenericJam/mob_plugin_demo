@@ -4,6 +4,13 @@
   plugin_spec_version: 1,
   description: "Demo tier-2 plugin: a native SignaturePad component (Mob.Component)",
 
+  # iOS: ship the SwiftUI view source for the merge engine to compile in
+  # alongside the host's project_swift_sources. No extra frameworks needed
+  # (SwiftUI + Foundation are already linked by the base mob app).
+  ios: %{
+    swift_files: ["priv/native/ios/MobSignaturePadView.swift"]
+  },
+
   ui_components: [
     %{
       tag: "SignaturePad",
