@@ -19,11 +19,15 @@ defmodule MobPluginDemo.MixProject do
 
   defp deps do
     [
-      {:mob,     path: "/Users/kevin/code/mob", override: true},
-      {:mob_dev, path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-host-config", only: :dev, runtime: false},
+      {:mob, path: "/Users/kevin/code/mob", override: true},
+      {:mob_dev,
+       path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-host-config",
+       only: :dev,
+       runtime: false},
       # Phase 1 prototype plugins (local path deps).
       {:mob_palette_demo, path: "plugins/mob_palette_demo"},
       {:mob_demo_haptic_extras, path: "plugins/mob_demo_haptic_extras"},
+      {:mob_demo_zig_extras, path: "plugins/mob_demo_zig_extras"},
       {:mob_demo_signature_pad, path: "plugins/mob_demo_signature_pad"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},

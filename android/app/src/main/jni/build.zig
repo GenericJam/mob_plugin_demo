@@ -64,6 +64,15 @@ pub fn build(b: *std.Build) void {
     // Basename (sans .c) is the NIF module name, used for the
     // STATIC_ERLANG_NIF_LIBNAME flag below.
     const plugin_c_nifs = b.option([]const u8, "plugin_c_nifs", "Comma-separated absolute paths to plugin C NIF sources; basename = NIF module name; empty if none") orelse "";
+    // Plugin zig NIFs — absolute paths to .zig files contributed by activated
+    // mob plugins (lang: :zig). Basename (sans .zig) is the NIF module name;
+    // the source names its own `export fn <name>_nif_init()` and reaches
+    // mob-core bindings via the `erts`/`jni` named imports wired in addZigObject.
+    const plugin_zig_nifs = b.option([]const u8, "plugin_zig_nifs", "Comma-separated absolute paths to plugin zig NIF sources; basename = NIF module name; empty if none") orelse "";
+    // Plugin JNI-thunk C sources (android.jni_source) — plain C compiled into
+    // the app .so so a plugin's Java_<pkg>_<Class>_* thunks resolve. No NIF
+    // init libname (these aren't NIFs).
+    const plugin_jni_sources = b.option([]const u8, "plugin_jni_sources", "Comma-separated absolute paths to plugin JNI-thunk C sources; empty if none") orelse "";
     // NxEigen (Eigen-backed Nx backend, C++ NIF). mob_dev cross-compiles
     // libnx_eigen.a per arch and threads the per-abi path through nxeigen_lib.
     const nxeigen_static = b.option(bool, "nxeigen_static", "NxEigen NIF statically linked (-DMOB_STATIC_NX_EIGEN_NIF on driver_tab)") orelse false;
@@ -270,6 +279,66 @@ pub fn build(b: *std.Build) void {
         }
     }
 
+    // --- Plugin zig NIFs (gathered by mob_dev from activated plugins) ────────
+    // Parallel to plugin_c_nifs but compiled via addZigObject. The plugin
+    // .zig names its own `export fn <module>_nif_init()` so it needs no
+    // STATIC_ERLANG_NIF_LIBNAME, and reaches mob-core bindings through the
+    // `erts`/`jni` named imports addZigObject wires when `mob_dir` is set
+    // (the plugin source lives outside mob/android/jni/ so it can't use the
+    // sibling-relative @import("mob_erts.zig") that mob_nif.zig itself uses).
+    if (plugin_zig_nifs.len > 0) {
+        var pz_it = std.mem.splitScalar(u8, plugin_zig_nifs, ',');
+        while (pz_it.next()) |path| {
+            if (path.len == 0) continue;
+            const basename = std.fs.path.basename(path);
+            const name = if (std.mem.endsWith(u8, basename, ".zig"))
+                basename[0 .. basename.len - 4]
+            else
+                basename;
+
+            const obj = addZigObject(b, .{
+                .name = name,
+                .source = path,
+                .target = target,
+                .optimize = optimize,
+                .mob_dir = mob_dir,
+            });
+            const install = b.addInstallFile(obj, b.fmt("{s}/{s}.o", .{ abi, name }));
+            c_objects_step.dependOn(&install.step);
+            obj_paths.append(b.allocator, obj) catch @panic("OOM");
+        }
+    }
+
+    // --- Plugin JNI-thunk C sources (android.jni_source) ─────────────────────
+    // Plain C objects (no STATIC_ERLANG_NIF_LIBNAME — these are Java_<pkg>_*
+    // JNI thunks, not NIF inits) compiled with the same flags as beam_jni.c so
+    // the plugin's nativeDeliver*/nativeRegister thunks resolve in the app .so.
+    if (plugin_jni_sources.len > 0) {
+        var j_it = std.mem.splitScalar(u8, plugin_jni_sources, ',');
+        while (j_it.next()) |path| {
+            if (path.len == 0) continue;
+            const basename = std.fs.path.basename(path);
+            const name = if (std.mem.endsWith(u8, basename, ".c"))
+                basename[0 .. basename.len - 2]
+            else
+                basename;
+
+            const obj = addCObject(b, .{
+                .name = name,
+                .source = path,
+                .target = target,
+                .optimize = optimize,
+                .c_flags = c_flags,
+                .otp_dir = otp_dir,
+                .erts_vsn = erts_vsn,
+                .mob_dir = mob_dir,
+            });
+            const install = b.addInstallFile(obj, b.fmt("{s}/{s}.o", .{ abi, name }));
+            c_objects_step.dependOn(&install.step);
+            obj_paths.append(b.allocator, obj) catch @panic("OOM");
+        }
+    }
+
     // Link: zig cc -shared, mirroring CMake's prior target_link_libraries
     // (--gc-sections + --whole-archive bracket around the OTP/crypto static
     // libs + plain libcrypto.a + Android system libs). Returns the cp
@@ -414,6 +483,12 @@ const ZigObjectOptions = struct {
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
     build_options: ?*std.Build.Step.Options = null,
+    // When set, wire named imports so the source can reach mob-core zig
+    // bindings via @import("erts") / @import("jni"). Plugin NIF sources live
+    // outside mob/android/jni/ so they can't use the sibling-relative
+    // @import("mob_erts.zig"); core objects sit beside those files and leave
+    // this null.
+    mob_dir: ?[]const u8 = null,
 };
 
 // addZigObject compiles a single .zig source file into a relocatable
@@ -437,6 +512,26 @@ fn addZigObject(b: *std.Build, opts: ZigObjectOptions) std.Build.LazyPath {
 
     if (opts.build_options) |build_opts| {
         mod.addOptions("build_options", build_opts);
+    }
+
+    // Plugin NIF sources reach mob-core bindings by name. The imported
+    // modules' own relative imports (e.g. mob_erts.zig → mob_zig.zig) still
+    // resolve against their mob-core location since those files are siblings.
+    if (opts.mob_dir) |mob_dir| {
+        const erts_mod = b.createModule(.{
+            .root_source_file = .{ .cwd_relative = b.fmt("{s}/android/jni/mob_erts.zig", .{mob_dir}) },
+            .target = opts.target,
+            .optimize = opts.optimize,
+            .pic = true,
+        });
+        const jni_mod = b.createModule(.{
+            .root_source_file = .{ .cwd_relative = b.fmt("{s}/android/jni/mob_zig.zig", .{mob_dir}) },
+            .target = opts.target,
+            .optimize = opts.optimize,
+            .pic = true,
+        });
+        mod.addImport("erts", erts_mod);
+        mod.addImport("jni", jni_mod);
     }
 
     const obj = b.addObject(.{
@@ -511,7 +606,7 @@ fn addLink(b: *std.Build, step: *std.Build.Step, opts: LinkOptions) *std.Build.S
         run.addArg(b.fmt("{s}/{s}/{s}", .{ opts.otp_dir, opts.erts_vsn, path }));
     }
 
-    run.addArgs(&.{ "-Wl,--no-whole-archive" });
+    run.addArgs(&.{"-Wl,--no-whole-archive"});
     run.addArg(b.fmt("{s}/{s}/lib/libcrypto.a", .{ opts.otp_dir, opts.erts_vsn }));
 
     // Project-side Rust/Zig static NIFs. Each `.a` exports
