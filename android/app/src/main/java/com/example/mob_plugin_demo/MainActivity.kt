@@ -127,6 +127,9 @@ class MainActivity : ComponentActivity() {
         // mob_dev). Each register() caches its own jclass + method IDs natively
         // so the plugin's NIF can call into it. Must run before the BEAM starts.
         io.mob.plugin.MobPluginBootstrap.registerAll()
+        // bt plugin needs an Activity for BluetoothManager/discovery. The
+        // generic plugin activity-handoff is a follow-up; wire it directly here.
+        io.mob.bluetooth.MobBluetoothBridge.setActivity(this)
 
         // Forward launcher-supplied env vars into the BEAM process. Set BEFORE
         // nativeStartBeam below so the BEAM (and Mob.Dist in particular) sees

@@ -29,7 +29,7 @@ defmodule MobPluginDemo.MixProject do
       {:mob_demo_haptic_extras, path: "plugins/mob_demo_haptic_extras"},
       {:mob_demo_zig_extras, path: "plugins/mob_demo_zig_extras"},
       {:mob_demo_signature_pad, path: "plugins/mob_demo_signature_pad"},
-      {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
+      {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth/.worktrees/session-b-nif"},
       {:ecto_sqlite3, "~> 0.18"},
       # Code quality — Credo + ex_slop (catches AI-generated patterns
       # like blanket rescue, narrator docs, redundant Enum chains, etc).
