@@ -112,12 +112,6 @@ Java_com_example_mob_1plugin_1demo_MobBridge_nativeDeliverAtom3(JNIEnv* env, jcl
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_mob_1plugin_1demo_MobBridge_nativeDeliverLocation(JNIEnv* env, jclass cls,
-    jlong pid, jdouble lat, jdouble lon, jdouble acc, jdouble alt) {
-    mob_deliver_location(pid, lat, lon, acc, alt);
-}
-
-JNIEXPORT void JNICALL
 Java_com_example_mob_1plugin_1demo_MobBridge_nativeDeliverMotion(JNIEnv* env, jclass cls,
     jlong pid, jdouble ax, jdouble ay, jdouble az,
     jdouble gx, jdouble gy, jdouble gz, jlong ts) {

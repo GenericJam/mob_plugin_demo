@@ -66,6 +66,7 @@ pub fn build(b: *std.Build) void {
     const project_swift_sources = b.option([]const u8, "project_swift_sources", "Comma-separated absolute paths to extra project Swift sources; empty if none") orelse "";
     const plugin_swift_files = b.option([]const u8, "plugin_swift_files", "Comma-separated absolute paths to plugin Swift sources; empty if none") orelse "";
     const plugin_frameworks = b.option([]const u8, "plugin_frameworks", "Comma-separated iOS framework names contributed by plugins; empty if none") orelse "";
+    const plugin_c_nifs = b.option([]const u8, "plugin_c_nifs", "Comma-separated absolute paths to plugin C NIF sources; basename = NIF module name; empty if none") orelse "";
     // MLX + EMLX. See build_device.zig.eex for full rationale.
     const mlx_static = b.option(bool, "mlx_static", "EMLX NIF statically linked + libmlx.a included (-DMOB_STATIC_EMLX_NIF on driver_tab)") orelse false;
     const mlx_dir = b.option([]const u8, "mlx_dir", "Absolute path to extracted MLX bundle (libmlx.a + libemlx.a + include/)") orelse "";
@@ -272,6 +273,45 @@ pub fn build(b: *std.Build) void {
                 .erts_vsn = erts_vsn,
                 .sdkroot = sdkroot,
             }), b.fmt("{s}.o", .{nif_name}));
+        }
+    }
+
+    // --- Plugin-side C NIFs (tier-1 plugins; absolute paths from mob_dev) ─────
+    // Mirrors the project_c_nifs block above and the Android build.zig
+    // plugin_c_nifs path. basename minus ".c" = the NIF module name = the
+    // STATIC_ERLANG_NIF_LIBNAME, which must match the <module>_nif_init symbol
+    // the generated driver_tab_ios references (populated by resolved_nifs/0).
+    if (plugin_c_nifs.len > 0) {
+        var p_it = std.mem.splitScalar(u8, plugin_c_nifs, ',');
+        while (p_it.next()) |path| {
+            if (path.len == 0) continue;
+            const base = std.fs.path.basename(path);
+            // .m sources (manifest lang: :objc) are Objective-C — an iOS plugin
+            // NIF driving an Apple framework (CoreLocation, etc.). Compiled as
+            // ObjC by extension; add -fobjc-arc + -fmodules. ".c"/".m" are both 2.
+            const is_objc = std.mem.endsWith(u8, base, ".m");
+            const name = if (std.mem.endsWith(u8, base, ".c") or is_objc) base[0 .. base.len - 2] else base;
+            const extra: usize = if (is_objc) 4 else 2;
+            const flags = b.allocator.alloc([]const u8, c_flags.len + extra) catch unreachable;
+            @memcpy(flags[0..c_flags.len], c_flags);
+            flags[c_flags.len] = "-DSTATIC_ERLANG_NIF";
+            flags[c_flags.len + 1] = b.fmt("-DSTATIC_ERLANG_NIF_LIBNAME={s}", .{name});
+            if (is_objc) {
+                flags[c_flags.len + 2] = "-fobjc-arc";
+                flags[c_flags.len + 3] = "-fmodules";
+            }
+
+            installAndCollect(b, objects_step, &objs, addCObject(b, .{
+                .name = name,
+                .source = path,
+                .target = target,
+                .optimize = optimize,
+                .c_flags = flags,
+                .mob_dir = mob_dir,
+                .otp_root = otp_root,
+                .erts_vsn = erts_vsn,
+                .sdkroot = sdkroot,
+            }), b.fmt("{s}.o", .{name}));
         }
     }
 

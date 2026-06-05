@@ -19,9 +19,13 @@ defmodule MobPluginDemo.MixProject do
 
   defp deps do
     [
-      {:mob, path: "/Users/kevin/code/mob", override: true},
+      # Repointed to the plugin-permission-registry worktrees while that work is
+      # in flight (restore to the main checkouts after merge).
+      {:mob,
+       path: "/Users/kevin/code/mob/.claude/worktrees/plugin-permission-registry",
+       override: true},
       {:mob_dev,
-       path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-host-config",
+       path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-permission-registry",
        only: :dev,
        runtime: false},
       # Phase 1 prototype plugins (local path deps).
@@ -29,6 +33,8 @@ defmodule MobPluginDemo.MixProject do
       {:mob_demo_haptic_extras, path: "plugins/mob_demo_haptic_extras"},
       {:mob_demo_zig_extras, path: "plugins/mob_demo_zig_extras"},
       {:mob_demo_signature_pad, path: "plugins/mob_demo_signature_pad"},
+      {:mob_demo_perm, path: "plugins/mob_demo_perm"},
+      {:mob_location, path: "/Users/kevin/code/mob_location"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},
       # Code quality — Credo + ex_slop (catches AI-generated patterns
