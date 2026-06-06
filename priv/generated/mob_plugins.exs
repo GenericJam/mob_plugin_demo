@@ -13,6 +13,16 @@
       module: MobDemoKvBrowser.DetailScreen,
       plugin: :mob_demo_kv_browser,
       default_route: "/kv/detail"
+    },
+    %{
+      module: MobDemoGenScreens.Screen,
+      plugin: :mob_demo_gen_screens,
+      default_route: "/gen/dashboard"
+    },
+    %{
+      module: MobDemoGenScreens.Screen,
+      plugin: :mob_demo_gen_screens,
+      default_route: "/gen/reports"
     }
   ],
   lifecycle: [

@@ -37,6 +37,7 @@ defmodule MobPluginDemo.MixProject do
       {:mob_demo_perm, path: "plugins/mob_demo_perm"},
       {:mob_demo_kv_browser, path: "plugins/mob_demo_kv_browser"},
       {:mob_demo_subapp, path: "plugins/mob_demo_subapp"},
+      {:mob_demo_gen_screens, path: "plugins/mob_demo_gen_screens"},
       {:mob_location, path: "/Users/kevin/code/mob_location"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},
