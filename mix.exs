@@ -19,13 +19,14 @@ defmodule MobPluginDemo.MixProject do
 
   defp deps do
     [
-      # Repointed to the plugin-permission-registry worktrees while that work is
-      # in flight (restore to the main checkouts after merge).
+      # Repointed to the plugin-tiers-3-4 worktrees (branched off
+      # plugin-permission-registry, so they carry the tier-1/2 infra plus the
+      # tier-3/4 work). Restore to the main checkouts after merge.
       {:mob,
-       path: "/Users/kevin/code/mob/.claude/worktrees/plugin-permission-registry",
+       path: "/Users/kevin/code/mob/.claude/worktrees/plugin-tiers-3-4",
        override: true},
       {:mob_dev,
-       path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-permission-registry",
+       path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-tiers-3-4",
        only: :dev,
        runtime: false},
       # Phase 1 prototype plugins (local path deps).
@@ -34,6 +35,8 @@ defmodule MobPluginDemo.MixProject do
       {:mob_demo_zig_extras, path: "plugins/mob_demo_zig_extras"},
       {:mob_demo_signature_pad, path: "plugins/mob_demo_signature_pad"},
       {:mob_demo_perm, path: "plugins/mob_demo_perm"},
+      {:mob_demo_kv_browser, path: "plugins/mob_demo_kv_browser"},
+      {:mob_demo_subapp, path: "plugins/mob_demo_subapp"},
       {:mob_location, path: "/Users/kevin/code/mob_location"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},

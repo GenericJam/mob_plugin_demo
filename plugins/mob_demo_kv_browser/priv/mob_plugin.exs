@@ -1,0 +1,12 @@
+%{
+  name: :mob_demo_kv_browser,
+  mob_version: "~> 0.6",
+  plugin_spec_version: 1,
+  description: "Tier-3 multi-screen demo: a two-screen key/value browser.",
+  # Tier 3: ship whole screens. The host registers them as navigable
+  # destinations at boot (by default_route) and chooses where to surface them.
+  screens: [
+    %{module: MobDemoKvBrowser.ListScreen, default_route: "/kv/list"},
+    %{module: MobDemoKvBrowser.DetailScreen, default_route: "/kv/detail"}
+  ]
+}
