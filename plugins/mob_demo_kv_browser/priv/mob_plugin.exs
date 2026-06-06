@@ -9,9 +9,6 @@
     %{module: MobDemoKvBrowser.ListScreen, default_route: "/kv/list"},
     %{module: MobDemoKvBrowser.DetailScreen, default_route: "/kv/detail"}
   ],
-  # Tier-3 migration: build-time copied into the host migrations dir
-  # (namespaced, version-preserving), run by the host's existing Ecto.Migrator.
-  migrations: %{repo_namespace: "kv_", migrations_dir: "priv/repo/migrations"},
   # Tier-3 assets: images are build-copied into the host bundle and addressable
   # from a screen via `plugin://mob_demo_kv_browser/<file>`; fonts are bundled +
   # registered (iOS UIAppFonts / Android assets/fonts) and used via `font:`.
