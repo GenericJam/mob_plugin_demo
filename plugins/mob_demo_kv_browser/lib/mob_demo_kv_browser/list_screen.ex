@@ -19,6 +19,7 @@ defmodule MobDemoKvBrowser.ListScreen do
     <Scroll background={:background}>
       <Column background={:background} padding={:space_lg}>
         <Text text="KV Browser (plugin)" text_size={:xl} text_color={:on_surface} padding={:space_sm} />
+        <Text text="rendered in a bundled plugin font" font="Georgia" text_size={:lg} text_color={:primary} padding={4} />
         <Image src="plugin://mob_demo_kv_browser/kv_icon.png" width={64} height={64} content_mode="fit" />
         <Spacer size={16} />
         {open_button("alpha", :open_alpha)}

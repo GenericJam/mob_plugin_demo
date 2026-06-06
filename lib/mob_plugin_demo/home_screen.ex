@@ -30,6 +30,8 @@ defmodule MobPluginDemo.HomeScreen do
         {nav_button("Camera",              :open_camera)}
         <Spacer size={12} />
         {nav_button("Storage",             :open_storage)}
+        <Spacer size={12} />
+        {nav_button("KV Browser (plugin)", :open_kv)}
         <Spacer size={24} />
         <Text text="Plugin demo — SignaturePad" text_size={:sm} text_color={:muted} padding={4} />
         <Spacer size={8} />
@@ -75,6 +77,12 @@ defmodule MobPluginDemo.HomeScreen do
 
   def handle_info({:tap, :open_storage}, socket) do
     {:noreply, Mob.Socket.push_screen(socket, MobPluginDemo.StorageScreen)}
+  end
+
+  # Navigate to a tier-3 plugin screen by its registered route — the plugin's
+  # ListScreen was registered into Mob.Nav.Registry at boot from its manifest.
+  def handle_info({:tap, :open_kv}, socket) do
+    {:noreply, Mob.Socket.push_screen(socket, :"/kv/list")}
   end
 
   def handle_info({:tap, :theme_obsidian}, socket) do
