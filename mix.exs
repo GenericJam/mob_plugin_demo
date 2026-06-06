@@ -19,16 +19,10 @@ defmodule MobPluginDemo.MixProject do
 
   defp deps do
     [
-      # Repointed to the plugin-tiers-3-4 worktrees (branched off
-      # plugin-permission-registry, so they carry the tier-1/2 infra plus the
-      # tier-3/4 work). Restore to the main checkouts after merge.
-      {:mob,
-       path: "/Users/kevin/code/mob/.claude/worktrees/plugin-tiers-3-4",
-       override: true},
-      {:mob_dev,
-       path: "/Users/kevin/code/mob_dev/.claude/worktrees/plugin-tiers-3-4",
-       only: :dev,
-       runtime: false},
+      # Tiers 3/4 + custom fonts merged to master 2026-06-06 — back on the
+      # main checkouts.
+      {:mob, path: "/Users/kevin/code/mob", override: true},
+      {:mob_dev, path: "/Users/kevin/code/mob_dev", only: :dev, runtime: false},
       # Phase 1 prototype plugins (local path deps).
       {:mob_palette_demo, path: "plugins/mob_palette_demo"},
       {:mob_demo_haptic_extras, path: "plugins/mob_demo_haptic_extras"},
