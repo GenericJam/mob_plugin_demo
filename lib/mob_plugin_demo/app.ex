@@ -25,17 +25,15 @@ defmodule MobPluginDemo.App do
     {:ok, _} = Application.ensure_all_started(:ecto_sqlite3)
     {:ok, _} = MobPluginDemo.Repo.start_link()
 
-    # Don't let a migration failure stop the app from rendering. On iOS the
-    # bundled Elixir stdlib sync is currently incomplete (`:elixir_quote.
-    # validate_quote/1` missing), so runtime `.exs` migration compilation
-    # crashes — a mob_dev deploy bug, not an app bug. Log and continue.
-    try do
-      Ecto.Migrator.with_repo(MobPluginDemo.Repo, fn repo ->
-        Ecto.Migrator.run(repo, migrations_dir(), :up, all: true)
-      end)
-    rescue
-      e -> require Logger; Logger.error("migrations skipped: #{Exception.message(e)}")
-    end
+    # Runtime `.exs` migration compilation needs the device's bundled Elixir
+    # stdlib to match the toolchain that compiled the app — otherwise
+    # `:elixir_quote.validate_quote/1` (and other compiler internals) are undef
+    # and this crashes. That was an iOS deploy bug (mob.exs `elixir_lib` pinned a
+    # stale rc.5 while the toolchain was 1.20.0 final); mob_dev now bundles the
+    # toolchain's stdlib. Run migrations normally — a failure here SHOULD surface.
+    Ecto.Migrator.with_repo(MobPluginDemo.Repo, fn repo ->
+      Ecto.Migrator.run(repo, migrations_dir(), :up, all: true)
+    end)
 
     Mob.Screen.start_root(MobPluginDemo.HomeScreen)
     Mob.Dist.ensure_started(node: :"mob_plugin_demo_android@127.0.0.1", cookie: :mob_secret)
