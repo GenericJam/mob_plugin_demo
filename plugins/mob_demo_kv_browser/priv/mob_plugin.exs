@@ -15,5 +15,12 @@
   assets: %{
     images: ["priv/assets/kv_icon.png"],
     fonts: ["priv/fonts/Georgia.ttf"]
+  },
+  # Tier-3 migration: mob_dev copies these `.exs` into the host's migrations dir
+  # at `--native` build, namespaced by `repo_namespace` (version-preserving), so
+  # the host's Ecto.Migrator creates the plugin's table alongside its own.
+  migrations: %{
+    repo_namespace: "kv_",
+    migrations_dir: "priv/repo/migrations"
   }
 }
