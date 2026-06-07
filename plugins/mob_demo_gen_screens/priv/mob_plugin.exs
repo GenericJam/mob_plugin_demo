@@ -8,5 +8,25 @@
   # host config keys the generator is allowed to read — an undeclared read fails
   # the build.
   screens_generator: {MobDemoGenScreens.Generator, :generate, []},
-  host_config_keys: [:gen_sections]
+  host_config_keys: [:gen_sections],
+  # Multi-tier composition: this plugin ALSO carries a tier-3 migration and
+  # tier-4 lifecycle/settings/notifications, all with names distinct from
+  # mob_demo_subapp's, so the conflict surface stays clean and multiple plugins
+  # stack per tier at runtime.
+  migrations: %{
+    repo_namespace: "gen_",
+    migrations_dir: "priv/repo/migrations"
+  },
+  lifecycle: %{
+    on_start: {MobDemoGenScreens, :start, []},
+    supervised: [MobDemoGenScreens.Worker]
+  },
+  settings: %{
+    schema: [%{key: :verbose, type: :boolean, default: false}]
+  },
+  notifications: %{
+    handlers: [
+      %{match: %{type: "gen_ping"}, handler: {MobDemoGenScreens.Notifications, :handle, 1}}
+    ]
+  }
 }

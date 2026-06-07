@@ -3,6 +3,20 @@
 # The activated plugins' tier-3/4 contributions, read at boot by Mob.Plugins.
 # Regenerated whenever `config :mob, :plugins` changes (the deploy/regen hook).
 %{
+  settings: [
+    %{
+      plugin: :mob_demo_subapp,
+      editor_screen: MobDemoSubapp.SettingsScreen,
+      schema: [
+        %{default: true, type: :boolean, key: :sound},
+        %{default: "#general", type: :string, key: :channel}
+      ]
+    },
+    %{
+      plugin: :mob_demo_gen_screens,
+      schema: [%{default: false, type: :boolean, key: :verbose}]
+    }
+  ],
   screens: [
     %{
       module: MobDemoKvBrowser.ListScreen,
@@ -25,6 +39,18 @@
       default_route: "/gen/reports"
     }
   ],
+  notification_handlers: [
+    %{
+      match: %{type: "subapp_ping"},
+      handler: {MobDemoSubapp.Notifications, :handle, 1},
+      plugin: :mob_demo_subapp
+    },
+    %{
+      match: %{type: "gen_ping"},
+      handler: {MobDemoGenScreens.Notifications, :handle, 1},
+      plugin: :mob_demo_gen_screens
+    }
+  ],
   lifecycle: [
     %{
       on_start: {MobDemoSubapp, :start, []},
@@ -32,23 +58,11 @@
       plugin: :mob_demo_subapp,
       on_background: {MobDemoSubapp, :on_background, []},
       supervised: [MobDemoSubapp.Worker]
-    }
-  ],
-  settings: [
+    },
     %{
-      plugin: :mob_demo_subapp,
-      editor_screen: MobDemoSubapp.SettingsScreen,
-      schema: [
-        %{default: true, type: :boolean, key: :sound},
-        %{default: "#general", type: :string, key: :channel}
-      ]
-    }
-  ],
-  notification_handlers: [
-    %{
-      match: %{type: "subapp_ping"},
-      handler: {MobDemoSubapp.Notifications, :handle, 1},
-      plugin: :mob_demo_subapp
+      on_start: {MobDemoGenScreens, :start, []},
+      plugin: :mob_demo_gen_screens,
+      supervised: [MobDemoGenScreens.Worker]
     }
   ]
 }
