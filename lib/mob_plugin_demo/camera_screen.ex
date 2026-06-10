@@ -47,17 +47,17 @@ defmodule MobPluginDemo.CameraScreen do
   end
 
   def handle_info({:tap, :start_preview}, socket) do
-    socket = Mob.Camera.start_preview(socket, facing: :back)
+    socket = MobCamera.start_preview(socket, facing: :back)
     {:noreply, Mob.Socket.assign(socket, previewing: true, status: "preview starting…")}
   end
 
   def handle_info({:tap, :stop_preview}, socket) do
-    socket = Mob.Camera.stop_preview(socket)
+    socket = MobCamera.stop_preview(socket)
     {:noreply, Mob.Socket.assign(socket, previewing: false, status: "preview stopped")}
   end
 
   def handle_info({:tap, :capture_photo}, socket) do
-    socket = Mob.Camera.capture_photo(socket, quality: :high)
+    socket = MobCamera.capture_photo(socket, quality: :high)
     {:noreply, Mob.Socket.assign(socket, status: "camera opening…")}
   end
 
@@ -76,7 +76,7 @@ defmodule MobPluginDemo.CameraScreen do
   def handle_info(_msg, socket), do: {:noreply, socket}
 
   def terminate(_reason, socket) do
-    if socket.assigns.previewing, do: Mob.Camera.stop_preview(socket)
+    if socket.assigns.previewing, do: MobCamera.stop_preview(socket)
     :ok
   end
 end

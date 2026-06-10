@@ -33,6 +33,7 @@ defmodule MobPluginDemo.MixProject do
       {:mob_demo_subapp, path: "plugins/mob_demo_subapp"},
       {:mob_demo_gen_screens, path: "plugins/mob_demo_gen_screens"},
       {:mob_location, path: "/Users/kevin/code/mob_location"},
+      {:mob_camera, path: "/Users/kevin/code/mob_camera"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},
       # Code quality — Credo + ex_slop (catches AI-generated patterns
