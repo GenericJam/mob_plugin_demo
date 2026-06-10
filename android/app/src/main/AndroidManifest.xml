@@ -58,6 +58,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
         android:minSdkVersion="34" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <!-- Package visibility (API 30+): apps we want to launch via Mob.Device.open_url. -->
     <queries>
@@ -118,6 +119,15 @@
         <service android:name=".BeamForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!-- mob_screencast: MediaProjection capture must run inside a foreground
+             service of type mediaProjection (enforced on API 30+ on this hardware).
+             The plugin's Kotlin (io.mob.screencast.ScreencastService) is merged into
+             the host build; the plugin manifest can contribute the uses-permission
+             entries but not this <service>, so it's carried here (PLAN.md known gap). -->
+        <service android:name="io.mob.screencast.ScreencastService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
         <!-- FCM token refresh (remote push notifications) -->
         <service android:name=".MobFirebaseService"
