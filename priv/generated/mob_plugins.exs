@@ -5,15 +5,15 @@
 %{
   nifs: [:mob_bluetooth_nif, :mob_zig_extras_nif, :haptic_extras_nif,
    :mob_demo_perm_nif, :mob_location_nif, :mob_camera_nif, :mob_photos_nif,
-   :mob_biometric_nif, :mob_screencast_nif],
+   :mob_biometric_nif, :mob_notify_nif, :mob_screencast_nif],
   settings: [
     %{
       plugin: :mob_demo_subapp,
-      editor_screen: MobDemoSubapp.SettingsScreen,
       schema: [
         %{default: true, type: :boolean, key: :sound},
         %{default: "#general", type: :string, key: :channel}
-      ]
+      ],
+      editor_screen: MobDemoSubapp.SettingsScreen
     },
     %{
       plugin: :mob_demo_gen_screens,
