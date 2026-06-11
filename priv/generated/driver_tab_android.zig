@@ -42,6 +42,8 @@ extern fn mob_zig_extras_nif_nif_init() callconv(.c) ?*anyopaque;
 extern fn haptic_extras_nif_nif_init() callconv(.c) ?*anyopaque;
 extern fn mob_location_nif_nif_init() callconv(.c) ?*anyopaque;
 extern fn mob_camera_nif_nif_init() callconv(.c) ?*anyopaque;
+extern fn mob_photos_nif_nif_init() callconv(.c) ?*anyopaque;
+extern fn mob_biometric_nif_nif_init() callconv(.c) ?*anyopaque;
 extern fn mob_screencast_nif_nif_init() callconv(.c) ?*anyopaque;
 
 // Comptime flags threaded from build.zig via b.addOptions().
@@ -79,6 +81,8 @@ const base_nifs = [_]ErtsStaticNif{
     .{ .nif_init = haptic_extras_nif_nif_init, .is_builtin = 0, .nif_mod = THE_NON_VALUE, .entry = null },
     .{ .nif_init = mob_location_nif_nif_init, .is_builtin = 0, .nif_mod = THE_NON_VALUE, .entry = null },
     .{ .nif_init = mob_camera_nif_nif_init, .is_builtin = 0, .nif_mod = THE_NON_VALUE, .entry = null },
+    .{ .nif_init = mob_photos_nif_nif_init, .is_builtin = 0, .nif_mod = THE_NON_VALUE, .entry = null },
+    .{ .nif_init = mob_biometric_nif_nif_init, .is_builtin = 0, .nif_mod = THE_NON_VALUE, .entry = null },
     .{ .nif_init = mob_screencast_nif_nif_init, .is_builtin = 0, .nif_mod = THE_NON_VALUE, .entry = null },
 };
 
