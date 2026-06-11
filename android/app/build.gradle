@@ -100,7 +100,6 @@ dependencies {
     implementation 'androidx.camera:camera-view:1.3.4'
 
     // ML Kit barcode scanning (QR scanner)
-    implementation 'com.google.mlkit:barcode-scanning:17.2.0'
 
     // Media3 ExoPlayer (video playback)
     implementation 'androidx.media3:media3-exoplayer:1.3.1'
@@ -123,4 +122,6 @@ dependencies {
     // retrieval will fail at runtime until you swap the file.
     implementation platform('com.google.firebase:firebase-bom:33.1.0')
     implementation 'com.google.firebase:firebase-messaging'
+    implementation "com.google.firebase:firebase-messaging:24.0.0"
+    implementation "com.google.mlkit:barcode-scanning:17.2.0"
 }
