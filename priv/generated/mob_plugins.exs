@@ -86,8 +86,8 @@
       supervised: [MobDemoGenScreens.Worker]
     }
   ],
-  styles: [%{name: :mob_theme_citrus, theme: MobThemeCitrus.Theme}],
-  default_style: :mob_theme_citrus,
+  styles: [%{name: :mob_themes, theme: MobThemes.Obsidian}],
+  default_style: :mob_themes,
   composites: [
     %{
       atom: :demo_card,

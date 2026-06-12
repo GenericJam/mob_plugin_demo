@@ -8,7 +8,7 @@ defmodule MobPluginDemo.HomeScreen do
     # (config :mob, :default_style is the DEFAULT; an explicit choice wins.)
     case Mob.State.get(:theme, nil) do
       nil ->
-        {:ok, Mob.Socket.assign(socket, :theme, :citrus)}
+        {:ok, Mob.Socket.assign(socket, :theme, :obsidian)}
 
       theme ->
         Mob.Theme.set(theme_to_module(theme))
@@ -106,19 +106,19 @@ defmodule MobPluginDemo.HomeScreen do
   end
 
   def handle_info({:tap, :theme_obsidian}, socket) do
-    Mob.Theme.set(Mob.Theme.Obsidian)
+    Mob.Theme.set(MobThemes.Obsidian)
     Mob.State.put(:theme, :obsidian)
     {:noreply, Mob.Socket.assign(socket, :theme, :obsidian)}
   end
 
   def handle_info({:tap, :theme_citrus}, socket) do
-    Mob.Theme.set(MobThemeCitrus.Theme)
+    Mob.Theme.set(MobThemes.Citrus)
     Mob.State.put(:theme, :citrus)
     {:noreply, Mob.Socket.assign(socket, :theme, :citrus)}
   end
 
   def handle_info({:tap, :theme_birch}, socket) do
-    Mob.Theme.set(Mob.Theme.Birch)
+    Mob.Theme.set(MobThemes.Birch)
     Mob.State.put(:theme, :birch)
     {:noreply, Mob.Socket.assign(socket, :theme, :birch)}
   end
@@ -136,9 +136,9 @@ defmodule MobPluginDemo.HomeScreen do
     ~MOB(<Button text={label} background={bg} text_color={fg} text_size={:sm} padding={:space_sm} weight={1} on_tap={tap} />)
   end
 
-  defp theme_to_module(:citrus), do: MobThemeCitrus.Theme
-  defp theme_to_module(:birch),  do: Mob.Theme.Birch
-  defp theme_to_module(_),       do: Mob.Theme.Obsidian
+  defp theme_to_module(:citrus), do: MobThemes.Citrus
+  defp theme_to_module(:birch), do: MobThemes.Birch
+  defp theme_to_module(_), do: MobThemes.Obsidian
 
   defp logo_src(:birch), do: Path.join(rootdir(), "mob_logo_dark.png")
   defp logo_src(_),      do: Path.join(rootdir(), "mob_logo_light.png")

@@ -40,7 +40,7 @@ defmodule MobPluginDemo.MixProject do
       {:mob_notify, path: "/Users/kevin/code/mob_notify"},
       {:mob_scanner, path: "/Users/kevin/code/mob_scanner"},
       {:mob_ash, path: "/Users/kevin/code/mob_ash"},
-      {:mob_theme_citrus, path: "/Users/kevin/code/mob_theme_citrus"},
+      {:mob_themes, path: "/Users/kevin/code/mob_themes"},
       {:mob_screencast, path: "/Users/kevin/code/mob_screencast"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},
