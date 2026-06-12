@@ -3,9 +3,17 @@ defmodule MobPluginDemo.HomeScreen do
   use Mob.Screen
 
   def mount(_params, _session, socket) do
-    theme = Mob.State.get(:theme, :obsidian)
-    Mob.Theme.set(theme_to_module(theme))
-    {:ok, Mob.Socket.assign(socket, :theme, theme)}
+    # Respect the styles lane: only override the boot-applied default style
+    # when the user has EXPLICITLY picked a theme from the switcher below.
+    # (config :mob, :default_style is the DEFAULT; an explicit choice wins.)
+    case Mob.State.get(:theme, nil) do
+      nil ->
+        {:ok, Mob.Socket.assign(socket, :theme, :citrus)}
+
+      theme ->
+        Mob.Theme.set(theme_to_module(theme))
+        {:ok, Mob.Socket.assign(socket, :theme, theme)}
+    end
   end
 
   def render(assigns) do
@@ -99,7 +107,7 @@ defmodule MobPluginDemo.HomeScreen do
   end
 
   def handle_info({:tap, :theme_citrus}, socket) do
-    Mob.Theme.set(Mob.Theme.Citrus)
+    Mob.Theme.set(MobThemeCitrus.Theme)
     Mob.State.put(:theme, :citrus)
     {:noreply, Mob.Socket.assign(socket, :theme, :citrus)}
   end
@@ -123,7 +131,7 @@ defmodule MobPluginDemo.HomeScreen do
     ~MOB(<Button text={label} background={bg} text_color={fg} text_size={:sm} padding={:space_sm} weight={1} on_tap={tap} />)
   end
 
-  defp theme_to_module(:citrus), do: Mob.Theme.Citrus
+  defp theme_to_module(:citrus), do: MobThemeCitrus.Theme
   defp theme_to_module(:birch),  do: Mob.Theme.Birch
   defp theme_to_module(_),       do: Mob.Theme.Obsidian
 
