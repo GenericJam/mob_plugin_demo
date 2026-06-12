@@ -13,3 +13,7 @@ config :mob, :repo, MobPluginDemo.Repo
 # (spec-v2 codegen) — it emits one screen per section, audited via
 # the plugin's :host_config_keys.
 config :mob_plugin_demo, :gen_sections, [:dashboard, :reports]
+
+# mob_ash reads this at build (audited spec-v2 host_config) and generates
+# /ash/post + /ash/post/detail + /ash/post/new from the domain's resources.
+config :mob_plugin_demo, :ash_domains, [MobPluginDemo.Blog]

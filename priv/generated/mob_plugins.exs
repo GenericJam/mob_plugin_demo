@@ -32,6 +32,24 @@
       default_route: "/kv/detail"
     },
     %{
+      module: MobAsh.ListScreen,
+      params: %{resource: MobPluginDemo.Blog.Post},
+      plugin: :mob_ash,
+      default_route: "/ash/post"
+    },
+    %{
+      module: MobAsh.DetailScreen,
+      params: %{resource: MobPluginDemo.Blog.Post},
+      plugin: :mob_ash,
+      default_route: "/ash/post/detail"
+    },
+    %{
+      module: MobAsh.FormScreen,
+      params: %{resource: MobPluginDemo.Blog.Post},
+      plugin: :mob_ash,
+      default_route: "/ash/post/new"
+    },
+    %{
       module: MobDemoGenScreens.Screen,
       plugin: :mob_demo_gen_screens,
       default_route: "/gen/dashboard"

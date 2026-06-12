@@ -38,6 +38,7 @@ defmodule MobPluginDemo.MixProject do
       {:mob_biometric, path: "/Users/kevin/code/mob_biometric"},
       {:mob_notify, path: "/Users/kevin/code/mob_notify"},
       {:mob_scanner, path: "/Users/kevin/code/mob_scanner"},
+      {:mob_ash, path: "/Users/kevin/code/mob_ash"},
       {:mob_screencast, path: "/Users/kevin/code/mob_screencast"},
       {:mob_bluetooth, path: "/Users/kevin/code/mob_bluetooth"},
       {:ecto_sqlite3, "~> 0.18"},

@@ -35,6 +35,16 @@ defmodule MobPluginDemo.App do
       Ecto.Migrator.run(repo, migrations_dir(), :up, all: true)
     end)
 
+    # Seed the mob_ash demo resource (ETS layer — empty on every boot).
+    for {title, body} <- [
+          {"Hello from Ash", "generated screens, on device"},
+          {"Second post", "tap a row for detail"}
+        ] do
+      MobPluginDemo.Blog.Post
+      |> Ash.Changeset.for_create(:create, %{title: title, body: body})
+      |> Ash.create!()
+    end
+
     Mob.Screen.start_root(MobPluginDemo.HomeScreen)
     Mob.Dist.ensure_started(node: :"mob_plugin_demo_android@127.0.0.1", cookie: :mob_secret)
   end
