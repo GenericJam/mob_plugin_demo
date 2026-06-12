@@ -87,5 +87,17 @@
     }
   ],
   styles: [%{name: :mob_theme_citrus, theme: MobThemeCitrus.Theme}],
-  default_style: :mob_theme_citrus
+  default_style: :mob_theme_citrus,
+  composites: [
+    %{
+      atom: :demo_card,
+      expand: {MobDemoKit.Card, :expand},
+      plugin: :mob_demo_kit
+    },
+    %{
+      atom: :demo_combobox,
+      expand: {MobDemoKit.Combobox, :expand},
+      plugin: :mob_demo_kit
+    }
+  ]
 }

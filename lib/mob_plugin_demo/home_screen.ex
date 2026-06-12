@@ -41,6 +41,7 @@ defmodule MobPluginDemo.HomeScreen do
         <Spacer size={12} />
         {nav_button("KV Browser (plugin)", :open_kv)}
         {nav_button("Ash Posts (generated)", :open_ash)}
+        {nav_button("Composite Kit (pure Elixir)", :open_kit)}
         <Spacer size={24} />
         <Text text="Plugin demo — SignaturePad" text_size={:sm} text_color={:muted} padding={4} />
         <Spacer size={8} />
@@ -98,6 +99,10 @@ defmodule MobPluginDemo.HomeScreen do
   # resource module rides the route as route-bound params (Registry.register/3).
   def handle_info({:tap, :open_ash}, socket) do
     {:noreply, Mob.Socket.push_screen(socket, :"/ash/post")}
+  end
+
+  def handle_info({:tap, :open_kit}, socket) do
+    {:noreply, Mob.Socket.push_screen(socket, MobPluginDemo.KitScreen)}
   end
 
   def handle_info({:tap, :theme_obsidian}, socket) do

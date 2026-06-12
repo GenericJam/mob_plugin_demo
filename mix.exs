@@ -32,6 +32,7 @@ defmodule MobPluginDemo.MixProject do
       {:mob_demo_kv_browser, path: "plugins/mob_demo_kv_browser"},
       {:mob_demo_subapp, path: "plugins/mob_demo_subapp"},
       {:mob_demo_gen_screens, path: "plugins/mob_demo_gen_screens"},
+      {:mob_demo_kit, path: "plugins/mob_demo_kit"},
       {:mob_location, path: "/Users/kevin/code/mob_location"},
       {:mob_camera, path: "/Users/kevin/code/mob_camera"},
       {:mob_photos, path: "/Users/kevin/code/mob_photos"},
