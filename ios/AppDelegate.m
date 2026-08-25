@@ -22,33 +22,15 @@ static void* beam_thread(void* arg) {
 }
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
-@property (strong, nonatomic) UIWindow *window;
 @end
 
 @implementation AppDelegate
 
+// Xcode 27 requires scene-based startup — window creation and BEAM boot moved
+// to SceneDelegate below. This stays a no-op rather than being dropped
+// entirely for parity with older AppDelegate-only expectations.
 - (BOOL)application:(UIApplication*)app
     didFinishLaunchingWithOptions:(NSDictionary*)opts {
-
-    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-
-    UIViewController* vc = [MobUIFactory makeRootViewController];
-    self.window.rootViewController = vc;
-    [self.window makeKeyAndVisible];
-
-    // Code-generated `mob_register_plugins` (see MobDev.Plugin.IOSBootstrap)
-    // populates MobNativeViewRegistry.shared with every activated plugin's
-    // SwiftUI view factory. Must run before mob_init_ui() so the registry is
-    // populated by the time the BEAM mounts its first screen.
-    mob_register_plugins();
-
-    mob_init_ui();
-
-    extern const char* mob_app_module(void);
-    pthread_t t;
-    pthread_create(&t, NULL, beam_thread, (void*)mob_app_module());
-    pthread_detach(t);
-
     return YES;
 }
 
@@ -66,6 +48,51 @@ static void* beam_thread(void* arg) {
 - (void)application:(UIApplication*)app
     didFailToRegisterForRemoteNotificationsWithError:(NSError*)error {
     NSLog(@"[Mob] Failed to register for remote notifications: %@", error);
+}
+
+@end
+
+// SceneDelegate — Xcode 27 requires scene-based app startup, so window
+// creation and the BEAM boot that used to live in
+// AppDelegate.didFinishLaunchingWithOptions: move here instead.
+@interface SceneDelegate : UIResponder <UIWindowSceneDelegate>
+@property (strong, nonatomic) UIWindow *window;
+@end
+
+@implementation SceneDelegate
+
+- (void)scene:(UIScene*)scene
+    willConnectToSession:(UISceneSession*)session
+    options:(UISceneConnectionOptions*)connectionOptions {
+    if (![scene isKindOfClass:[UIWindowScene class]]) {
+        return;
+    }
+
+    self.window = [[UIWindow alloc] initWithWindowScene:(UIWindowScene*)scene];
+    self.window.rootViewController = [MobUIFactory makeRootViewController];
+    [self.window makeKeyAndVisible];
+
+    // willConnectToSession: can fire more than once per process — iOS may
+    // disconnect the scene (memory pressure, backgrounding) and later
+    // reconnect it without relaunching the app. The window above is rebuilt
+    // every time, but the plugin registry and the BEAM must boot exactly
+    // once per process: a second erl_start in the same process is fatal, and
+    // nothing in mob's native layer guards against it.
+    static dispatch_once_t mob_boot_once;
+    dispatch_once(&mob_boot_once, ^{
+        // Code-generated `mob_register_plugins` (see MobDev.Plugin.IOSBootstrap)
+        // populates MobNativeViewRegistry.shared with every activated plugin's
+        // SwiftUI view factory. Must run before mob_init_ui() so the registry is
+        // populated by the time the BEAM mounts its first screen.
+        mob_register_plugins();
+
+        mob_init_ui();
+
+        extern const char* mob_app_module(void);
+        pthread_t t;
+        pthread_create(&t, NULL, beam_thread, (void*)mob_app_module());
+        pthread_detach(t);
+    });
 }
 
 @end
