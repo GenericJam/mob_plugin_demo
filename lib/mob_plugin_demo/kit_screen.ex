@@ -38,7 +38,7 @@ defmodule MobPluginDemo.KitScreen do
   end
 
   @impl true
-  def handle_info({:combo_query, q}, socket) do
+  def handle_info({:change, :combo_query, q}, socket) do
     options = Enum.filter(@fruit, &String.contains?(&1, String.downcase(q)))
 
     {:noreply,

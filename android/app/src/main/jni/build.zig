@@ -571,7 +571,7 @@ fn addLink(b: *std.Build, step: *std.Build.Step, opts: LinkOptions) *std.Build.S
     const ndk_clang = b.fmt("{s}/../bin/clang", .{opts.ndk_sysroot});
     const target_arg = b.fmt("--target={s}24", .{opts.arch_triple});
 
-    const run = b.addSystemCommand(&.{ ndk_clang, target_arg, "-shared" });
+    const run = b.addSystemCommand(&.{ ndk_clang, target_arg, "-shared", "-Wl,-z,max-page-size=16384" });
     run.addArg(b.fmt("--sysroot={s}", .{opts.ndk_sysroot}));
     // -Wl,-soname pins the DT_SONAME of the produced .so. Other libs that
     // link against this one (sqlite3_nif via CMake) put the SONAME in their
@@ -703,7 +703,7 @@ fn addExqliteLink(b: *std.Build, step: *std.Build.Step, opts: ExqliteLinkOptions
         .{ opts.project_root, opts.abi, opts.app_name },
     );
 
-    const run = b.addSystemCommand(&.{ ndk_clang, target_arg, "-shared" });
+    const run = b.addSystemCommand(&.{ ndk_clang, target_arg, "-shared", "-Wl,-z,max-page-size=16384" });
     if (opts.depends_on) |dep| run.step.dependOn(dep);
     run.addArg(b.fmt("--sysroot={s}", .{opts.ndk_sysroot}));
     run.addArg(b.fmt("-Wl,-soname,{s}", .{so_name}));
