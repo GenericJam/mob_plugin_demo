@@ -1,0 +1,10 @@
+context platform=ios device="claude-demo" kind=simulator theme=unknown
+open "com.example.mob_plugin_demo" --relaunch
+wait "text" "KV Browser (plugin)" 30000
+press "id=\"open_kv\" || role=\"button\" label=\"KV Browser (plugin)\" || label=\"KV Browser (plugin)\""
+wait "text" "rendered in a bundled plugin font"
+press "id=\"open_beta\" || role=\"button\" label=\"beta\" || label=\"beta\""
+wait "text" "value: second letter"
+press "id=\"back\" || role=\"button\" label=\"Back\" || label=\"Back\""
+wait "text" "gamma"
+close

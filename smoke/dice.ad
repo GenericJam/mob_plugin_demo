@@ -1,0 +1,10 @@
+context platform=ios device="iPhone Air" kind=simulator theme=unknown
+open "com.example.mob_plugin_demo" --relaunch
+wait "text" "Roll Dice" 30000
+press "id=\"open_dice\" || role=\"button\" label=\"Roll Dice\" || label=\"Roll Dice\""
+wait "text" "Roll!"
+press "id=\"roll\" || role=\"button\" label=\"Roll!\" || label=\"Roll!\""
+wait "text" "Last 1 rolls"
+press "id=\"back\" || role=\"button\" label=\"← Back\" || label=\"← Back\""
+wait "text" "Roll Dice"
+close
