@@ -10,7 +10,6 @@ app (mob 0.9.7+).
 | Flow | Checks |
 |---|---|
 | `dice.ad` | Home → Roll Dice → roll once ("Last 1 rolls") → back. Three receipts. |
-| `kv_browser.ad` | Home → KV Browser, the in-repo plugin: its bundled-font line and seeded entries render. One receipt. |
 
 ## Running
 
