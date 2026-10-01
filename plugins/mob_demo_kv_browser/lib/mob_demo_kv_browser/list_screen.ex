@@ -32,9 +32,12 @@ defmodule MobDemoKvBrowser.ListScreen do
     """
   end
 
-  def handle_event("open_alpha", _p, socket), do: open(socket, "alpha")
-  def handle_event("open_beta", _p, socket), do: open(socket, "beta")
-  def handle_event("open_gamma", _p, socket), do: open(socket, "gamma")
+  # `on_tap: {pid, tag}` arrives as `{:tap, tag}` in handle_info/2;
+  # handle_event/3 only serves Mob.Screen.dispatch/3.
+  def handle_info({:tap, :open_alpha}, socket), do: open(socket, "alpha")
+  def handle_info({:tap, :open_beta}, socket), do: open(socket, "beta")
+  def handle_info({:tap, :open_gamma}, socket), do: open(socket, "gamma")
+  def handle_info(_msg, socket), do: {:noreply, socket}
 
   defp open(socket, key) do
     {:noreply, Mob.Socket.push_screen(socket, MobDemoKvBrowser.DetailScreen, %{key: key})}

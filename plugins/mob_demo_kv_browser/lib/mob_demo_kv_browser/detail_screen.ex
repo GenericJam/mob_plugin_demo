@@ -28,5 +28,6 @@ defmodule MobDemoKvBrowser.DetailScreen do
     """
   end
 
-  def handle_event("back", _p, socket), do: {:noreply, Mob.Socket.pop_screen(socket)}
+  def handle_info({:tap, :back}, socket), do: {:noreply, Mob.Socket.pop_screen(socket)}
+  def handle_info(_msg, socket), do: {:noreply, socket}
 end
