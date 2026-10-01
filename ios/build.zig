@@ -256,10 +256,11 @@ pub fn build(b: *std.Build) void {
         var c_it = std.mem.splitScalar(u8, project_c_nifs, ',');
         while (c_it.next()) |nif_name| {
             if (nif_name.len == 0) continue;
-            const flags = b.allocator.alloc([]const u8, c_flags.len + 2) catch unreachable;
+            // LIBNAME alone: erl_nif.h defines STATIC_ERLANG_NIF from it, so
+            // passing -DSTATIC_ERLANG_NIF too trips -Wmacro-redefined (MOB-284).
+            const flags = b.allocator.alloc([]const u8, c_flags.len + 1) catch unreachable;
             @memcpy(flags[0..c_flags.len], c_flags);
-            flags[c_flags.len] = "-DSTATIC_ERLANG_NIF";
-            flags[c_flags.len + 1] = b.fmt("-DSTATIC_ERLANG_NIF_LIBNAME={s}", .{nif_name});
+            flags[c_flags.len] = b.fmt("-DSTATIC_ERLANG_NIF_LIBNAME={s}", .{nif_name});
 
             installAndCollect(b, objects_step, &objs, addCObject(b, .{
                 .name = nif_name,

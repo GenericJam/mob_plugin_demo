@@ -299,8 +299,9 @@ pub fn build(b: *std.Build) void {
     // --- Project-side C NIFs (auto-wired from mob.exs :static_nifs) ───────────
     // Each entry name maps to `c_src/<name>.c`. mob_dev passes the
     // comma-separated list of names, plus the project root path for
-    // resolving the sources. -DSTATIC_ERLANG_NIF selects the static-link
-    // dispatch path in erl_nif.h; -DSTATIC_ERLANG_NIF_LIBNAME=<name>
+    // resolving the sources. -DSTATIC_ERLANG_NIF_LIBNAME=<name> selects the
+    // static-link dispatch path in erl_nif.h (it defines STATIC_ERLANG_NIF;
+    // passing that too trips -Wmacro-redefined, MOB-284) and
     // overrides the init function's symbol name to `<name>_nif_init`
     // (matching driver_tab's declaration). Without the latter, the
     // macro tries to mangle the BEAM module name (e.g.
@@ -309,10 +310,9 @@ pub fn build(b: *std.Build) void {
         var c_it = std.mem.splitScalar(u8, project_c_nifs, ',');
         while (c_it.next()) |nif_name| {
             if (nif_name.len == 0) continue;
-            const flags = b.allocator.alloc([]const u8, c_flags_base.len + 2) catch unreachable;
+            const flags = b.allocator.alloc([]const u8, c_flags_base.len + 1) catch unreachable;
             @memcpy(flags[0..c_flags_base.len], c_flags_base);
-            flags[c_flags_base.len] = "-DSTATIC_ERLANG_NIF";
-            flags[c_flags_base.len + 1] = b.fmt("-DSTATIC_ERLANG_NIF_LIBNAME={s}", .{nif_name});
+            flags[c_flags_base.len] = b.fmt("-DSTATIC_ERLANG_NIF_LIBNAME={s}", .{nif_name});
 
             installAndCollect(b, objects_step, &objs, addCObject(b, .{
                 .name = nif_name,
