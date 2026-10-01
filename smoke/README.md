@@ -21,17 +21,24 @@ then:
 mix mob.smoke --device <serial-or-udid>
 ```
 
-**iOS simulator:** until MOB-139 is fixed, an app launched by anything other
-than mob_dev binds its BEAM distribution to port 9101 and dies silently if
-another mob simulator app holds it. The flows relaunch the app, so give it a
-free port:
+Needs mob ≥ 0.9.9 and mob_dev ≥ 0.7.8. Older iOS builds can't be reached after
+a flow relaunches the app (MOB-139, MOB-348), so health goes unchecked.
+
+**Physical iPhone:** agent-device signs its runner with automatic signing.
+Start its daemon with your team and a bundle ID your team profile covers:
 
 ```bash
-SIMCTL_CHILD_MOB_DIST_PORT=9555 mix mob.smoke --device <simulator-udid>
+export AGENT_DEVICE_STATE_DIR=/tmp/ad-$USER \
+  AGENT_DEVICE_IOS_TEAM_ID=<team id> \
+  AGENT_DEVICE_IOS_BUNDLE_ID=com.<you>.agentdevice.runner
+mix mob.smoke --device <iphone-udid>
 ```
 
-A physical iPhone also needs agent-device's runner signed; see mob_dev's README
-("Smoke flows on devices").
+The first run asks for Touch ID or the passcode on the phone, to enable UI
+automation. Approve it there; unattended runs time out until you do.
+
+`kv_browser.ad` scrolls the home screen to the bottom first: on a small phone
+(iPhone SE) the KV Browser button is below the fold.
 
 ## Recording
 

@@ -1,6 +1,7 @@
-context platform=ios device="claude-demo" kind=simulator theme=unknown
+context platform=ios device="Kevin’s iPhone" kind=device theme=unknown
 open "com.example.mob_plugin_demo" --relaunch
-wait "text" "KV Browser (plugin)" 30000
+wait "text" "Roll Dice" 30000
+scroll "bottom"
 press "id=\"open_kv\" || role=\"button\" label=\"KV Browser (plugin)\" || label=\"KV Browser (plugin)\""
 wait "text" "rendered in a bundled plugin font"
 press "id=\"open_beta\" || role=\"button\" label=\"beta\" || label=\"beta\""
