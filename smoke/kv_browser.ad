@@ -1,0 +1,7 @@
+context platform=ios device="iPhone Air" kind=simulator theme=unknown
+open "com.example.mob_plugin_demo" --relaunch
+wait "text" "KV Browser (plugin)" 30000
+press "id=\"open_kv\" || role=\"button\" label=\"KV Browser (plugin)\" || label=\"KV Browser (plugin)\""
+wait "text" "rendered in a bundled plugin font"
+wait "text" "gamma"
+close
